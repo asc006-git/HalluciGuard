@@ -1,0 +1,49 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environments
+venv/
+.venv/
+env/
+.env/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Large artifacts (regenerate with scripts)
+*.pkl
+*.joblib
+*.model
+*.bin
+
+# Datasets (regenerate with create_splits.py)
+halluciguard_dataset.csv
+train.csv
+test.csv
+
+# Analysis outputs (regenerate with analyze_errors.py)
+false_positives.csv
+false_negatives.csv
+
+# Logs
+*.log
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Environment
+.env
+*.env
