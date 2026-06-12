@@ -1,0 +1,3 @@
+label,class,n_samples,char_mean,char_median,char_std,char_min,char_max,word_mean,word_median,word_std,word_min,word_max
+0,Factual,10000,13.6538,12.0,12.028308841285964,1,529,2.2247,2.0,1.8449255499961246,1,81
+1,Hallucination,10000,66.2226,58.0,36.282073922652394,3,380,10.9863,9.0,6.145037710123989,1,61

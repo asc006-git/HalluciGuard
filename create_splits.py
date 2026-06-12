@@ -65,9 +65,9 @@ def main():
         for pair in list(overlap)[:3]:
             print(f"  Leaked: {pair[0][:50]}... | {pair[1][:50]}...")
     
-    df_train[["text", "label"]].to_csv("train.csv", index=False)
-    df_test[["text", "label"]].to_csv("test.csv", index=False)
-    print("\nSaved: train.csv, test.csv")
+    df_train[["text", "label"]].to_csv("data/processed/train.csv", index=False)
+    df_test[["text", "label"]].to_csv("data/processed/test.csv", index=False)
+    print("\nSaved: data/processed/train.csv, data/processed/test.csv")
     
     print("\n=== Class Distribution ===")
     print("Train:")

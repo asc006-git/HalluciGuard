@@ -1,0 +1,2 @@
+model,accuracy,precision,recall,f1,roc_auc
+Length-Only Logistic Regression,0.9435,0.9516293279022403,0.9345,0.942986881937437,0.9716514999999999

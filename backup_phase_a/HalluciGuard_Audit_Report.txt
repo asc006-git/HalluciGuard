@@ -1,0 +1,444 @@
+================================================================================
+               HALLUCIGUARD - COMPLETE PROJECT AUDIT REPORT
+================================================================================
+  Date:         June 12, 2026 - 15:55 IST
+  Auditor:      Principal ML Engineer / Research Scientist / 
+                Amazon ML Summer School Evaluator / Open Source Maintainer
+  Repository:   c:\Users\HP\Desktop\HalluciGuard
+  Branch:       main (17 commits, all June 11, 2026 19:55–20:01 IST)
+  Current State: 27 uncommitted files (scripts, results, plots, models)
+================================================================================
+
+TABLE OF CONTENTS
+-----------------
+1. Executive Summary & Verdict
+2. Perspective 1: Machine Learning & Research Audit
+   2.1 ML Lifecycle Coverage
+   2.2 Methodological Rigor & Confound Analysis
+   2.3 Clarifying Answers to Core Audit Questions
+3. Perspective 2: Repository Rationalization Audit
+   3.1 Project File Classification & Inventory
+   3.2 Project Dependency & Data Flow Map
+   3.3 Repository Hygiene & Structure Issues
+   3.4 Minimum Reproducibility Set
+4. Evaluation Scores & Metrics
+5. Critical Actions Before Public Release
+6. Recommended Repository Reorganization
+7. Concluding Direct Verdicts (4 Personas)
+
+
+================================================================================
+1. EXECUTIVE SUMMARY & VERDICT
+================================================================================
+HalluciGuard is a rigorous, highly insightful investigation into LLM hallucination
+detection utilizing the HaluEval QA benchmark dataset. Rather than simply training
+a model and reporting high metrics, this project acts as a critique of the underlying
+data benchmark. 
+
+The audit reveals a project with an exceptionally strong scientific foundation:
+it uncovers a massive dataset confound (length bias) where hallucinated answers are,
+on average, nearly five times longer than correct answers. Consequently, a simple
+2-parameter "Length-Only" model (94.35% accuracy) out-performs standard content-based
+models (91.90% accuracy). The project also correctly identifies and remediates
+train-test split leakage occurring when data expansion is done prior to splitting.
+
+However, the project is severely undermined by repository structure issues:
+- There are 44 files at the root level, making it look cluttered and disorganized.
+- 27 files remain uncommitted, leading to a massive gap between the local workspace
+  and the remote GitHub state.
+- Multiple duplicate text cleaning functions and redundant plotting scripts exist.
+- Standard folders like src/, data/, docs/, and models/ are missing or empty.
+
+VERDICT: This is a highly portfolio-worthy and Amazon ML Summer School-worthy project
+in terms of intellectual and scientific content, but it requires immediate, focused
+refactoring and repository cleanup to look professional to recruiters and maintainers.
+
+
+================================================================================
+2. PERSPECTIVE 1: MACHINE LEARNING & RESEARCH AUDIT
+================================================================================
+
+2.1 ML Lifecycle Coverage
+-------------------------
+We evaluate the coverage and quality of each ML lifecycle stage in the repository:
+
+| Stage                     | Script(s) / Files                      | Status   | Score  | Notes / Audit Observations |
+|---------------------------|----------------------------------------|----------|--------|----------------------------|
+| Problem Formulation       | README.md                              | Complete | 9 / 10 | Formalizes y = f(K,Q,A) binary classification task. |
+| Dataset Ingestion         | inspect_halueval.py                    | Complete | 8 / 10 | Pulls directly from HuggingFace HaluEval QA split. |
+| Preprocessing & Cleaning  | clean_text() in 14+ scripts            | Complete | 5 / 10 | Redundant, hardcoded regex replacements in each file. |
+| Train/Test Methodology    | create_splits.py                       | Correct  | 10/10  | Splitting paired examples BEFORE binary expansion. |
+| Leakage Remediation       | check_leakage.py                       | Complete | 10/10  | Mathematically proves and fixes 32.24% context leakage. |
+| Exploratory Data Analysis | eda_basic.py, eda_plots.py, top_words.py| Complete | 8 / 10 | Uncovers text lengths, word counts, class balances. |
+| Feature Engineering       | TF-IDF (ngram range 1-2, sublinear TF) | Complete | 7 / 10 | Max features set to 10k; TF-IDF fit is solid. |
+| Baseline Comparisons     | evaluate_baselines.py                  | Complete | 9 / 10 | Compares against Random (50%) & Majority (50%). |
+| Confound Identification   | evaluate_length_baseline.py            | Complete | 10/10  | Trains LogReg on lengths to expose length artifact. |
+| Model Development         | train_baseline_clean.py, train_svc.py  | Complete | 7 / 10 | TF-IDF + LogReg and LinearSVC baselines. |
+| Ablation Studies          | ablation_study.py                      | Complete | 9 / 10 | Evaluates: Answer-Only vs Q+A vs Knowledge+Q+A. |
+| Cross-Validation          | cross_validation_study.py              | Complete | 7 / 10 | 5-fold stratified CV, but has vocabulary leakage. |
+| Error Analysis            | analyze_errors.py                      | Complete | 8 / 10 | Generates FP/FN lists, evaluates model confidence. |
+| Model Comparison          | create_final_comparison.py             | Complete | 9 / 10 | Ranks all trained models in results/ comparison CSV.|
+| Reproducibility           | results/ directory                     | Complete | 9 / 10 | Persists CSV, JSON, and PNG metrics of all runs. |
+
+2.2 Methodological Rigor & Confound Analysis
+--------------------------------------------
+1. Data Leakage Remediation:
+   In HaluEval, each source record contains a Knowledge context (K), a Question (Q),
+   a Right Answer (A_right), and a Hallucinated Answer (A_halluc). If we expand this
+   directly into binary pairs:
+     - Pair 1: (K, Q, A_right) -> label=0
+     - Pair 2: (K, Q, A_halluc) -> label=1
+   and then perform a random split at the binary sample level, Pair 1 might end up
+   in the training set and Pair 2 in the test set. Because they share the identical
+   (K, Q) context, the model will memorize context details rather than learning
+   generalizable factual verification.
+   The project successfully fixes this by splitting the 10,000 paired rows first
+   (8,000 train, 2,000 test) and then expanding them into binary sets (16,000 train,
+   4,000 test). This drops overlap leakage from 32.24% down to exactly 0.00%.
+
+2. Exposing the Length Confound:
+   The length-based exploratory analysis reveals that:
+     - Factual answers are extremely short (mean: 13.65 characters, 2.22 words).
+     - Hallucinated answers are much longer (mean: 66.22 characters, 10.98 words).
+   A simple Logistic Regression trained on only two features—character count and word
+   count—achieves 94.35% accuracy and an F1-score of 0.9430 on the test set. 
+   This length model outperforms the text content model (TF-IDF on Answer-Only) which
+   scores 91.90% accuracy. This indicates that the HaluEval QA benchmark is heavily
+   biased; the models are not learning factuality or semantic coherence, but are
+   primarily acting as sentence-length classifiers.
+
+3. Input Format Ablation:
+   The ablation study yields a fascinating and counter-intuitive result:
+     - Answer-Only: 91.90% Accuracy (F1: 0.9161)
+     - Question + Answer: 74.10% Accuracy (F1: 0.7319)
+     - Full (Knowledge + Question + Answer): 64.30% Accuracy (F1: 0.6165)
+   Adding more context (Question and Knowledge) actually hurts the TF-IDF model.
+   This is because the Knowledge context is very long and identical across factual
+   and hallucinated versions of a question. It acts as massive textual noise,
+   confounding the Logistic Regression classifier which tries to associate terms in
+   the Knowledge context with the labels, leading to overfitting.
+
+4. Cross-Validation Vocabulary Leakage:
+   The cross_validation_study.py script performs a stratified 5-fold CV. However,
+   it fits the TfidfVectorizer on the entire training set before executing the CV
+   folds loop. This is a classic methodology slip: vocabulary definition and IDF
+   frequency calculations leak from validation folds into training folds. Though the
+   practical impact is minimal due to the large dataset size, this is a research gap
+   that must be noted.
+
+2.3 Clarifying Answers to Core Audit Questions
+----------------------------------------------
+* Is this a legitimate ML project?
+  Yes. It contains a complete pipeline, handles a real-world benchmark, and provides
+  a deep analysis of dataset artifacts.
+
+* Is it resume-worthy?
+  Highly. It demonstrates the ability to critique datasets and catch methodological
+  errors. This is a critical skill for Principal ML Engineers and Research Scientists
+  that distinguishes them from beginners.
+
+* Is it Amazon ML Summer School worthy?
+  Yes. It perfectly aligns with the curriculum's emphasis on data rigor, leakages,
+  and baselines.
+
+* Is the ML portion complete?
+  Yes, the pipeline is complete. However, from a modeling standpoint, it lacks a
+  deep learning baseline (e.g. DistilBERT or RoBERTa), which is standard in 2026.
+
+* Are additional models actually necessary?
+  Yes, to determine whether deep learning models are also tricked by the length confound,
+  or if they can successfully learn the semantics of factuality independent of length.
+
+* What are the strongest and weakest technical aspects?
+  - Strongest: Leakage detection/remediation, baseline comparison with length features,
+    comprehensive ablation study, and qualitative error analysis.
+  - Weakest: Vocabulary leakage in CV, hardcoded code redundancy, and poor file hygiene.
+
+* What scientific contribution or insight does the project provide?
+  It proves that the HaluEval QA benchmark is highly flawed due to generating
+  hallucinated answers that are systematically longer than correct answers. Any model
+  trained on it must control for sentence length to claim true semantic factuality.
+
+
+================================================================================
+3. PERSPECTIVE 2: REPOSITORY RATIONALIZATION AUDIT
+================================================================================
+
+3.1 Project File Classification & Inventory
+-------------------------------------------
+We classify all 44 workspace files under the following taxonomy:
+
+- KEEP: Essential files that belong in the final repository.
+- ARCHIVE: Valuable historical experiments that should be placed in a subfolder.
+- MOVE: Active files that are kept but should be relocated to a standard directory.
+- REGENERATE: Files that are outputs and should not be tracked, but generated by scripts.
+- SAFE TO DELETE: Redundant, deprecated, or temporary files.
+
+| File Path / Name                          | Classification  | Target Dir       | Explanation / Rationale |
+|--------------------------------------------|-----------------|------------------|-------------------------|
+| .gitignore                                 | KEEP            | Root             | Essential configuration. |
+| README.md                                  | KEEP            | Root             | Essential documentation. |
+| requirements.txt                           | KEEP            | Root             | Essential dependencies. |
+| predict.py                                 | KEEP            | Root (or src/)   | Active inference CLI and interactive script. |
+| inspect_halueval.py                        | MOVE            | scripts/         | Data ingestion demo script. |
+| create_splits.py                           | MOVE            | src/data/        | Core data preparation script. |
+| check_leakage.py                           | MOVE            | scripts/         | Diagnostic leakage proof. |
+| eda_basic.py                               | MOVE            | scripts/         | In-depth statistics utility. |
+| eda_plots.py                               | MOVE            | scripts/         | Plot generation script. |
+| top_words.py                               | MOVE            | scripts/         | Word frequency analyser. |
+| analyze_length_statistics.py                | MOVE            | scripts/         | Text length analyser. |
+| train_baseline_clean.py                    | MOVE            | src/models/      | Clean baseline trainer. |
+| train_answer_only.py                       | MOVE            | src/models/      | Answer-only trainer. |
+| train_linear_svc.py                        | MOVE            | src/models/      | Alternative SVM baseline trainer. |
+| evaluate_baselines.py                      | MOVE            | src/evaluation/  | Baselines evaluator. |
+| evaluate_length_baseline.py                | MOVE            | src/evaluation/  | Confound analyzer script. |
+| ablation_study.py                          | MOVE            | src/evaluation/  | Input format ablater. |
+| cross_validation_study.py                  | MOVE            | src/evaluation/  | Cross validator. |
+| analyze_errors.py                          | MOVE            | src/evaluation/  | Error analysis script. |
+| create_final_comparison.py                 | MOVE            | src/evaluation/  | Result compilation script. |
+| plot_*.py (12 distinct files)              | MOVE            | src/visualize/   | Separate plot generators (consolidate!). |
+| results/ (directory)                       | KEEP            | results/         | Persisted experimental metrics. |
+| models/answer_only_model.pkl               | MOVE            | models/          | Clean active model pkl. |
+| models/answer_only_vectorizer.pkl          | MOVE            | models/          | Clean active vectorizer pkl. |
+| logistic_model.pkl                         | MOVE            | models/          | Clean baseline model pkl. |
+| tfidf_vectorizer.pkl                       | MOVE            | models/          | Clean baseline vectorizer pkl. |
+| train.csv                                  | MOVE / REGEN    | data/            | Data split file (untracked via .gitignore). |
+| test.csv                                   | MOVE / REGEN    | data/            | Data split file (untracked via .gitignore). |
+| halluciguard_dataset.csv                   | SAFE TO DELETE  | -                | Redundant temporary unified dataset. |
+| halluciguard_logreg_model.pkl              | SAFE TO DELETE  | -                | Deprecated model (leaky split). |
+| halluciguard_tfidf_vectorizer.pkl          | SAFE TO DELETE  | -                | Deprecated vectorizer (leaky split). |
+| train_baseline.py                          | SAFE TO DELETE  | -                | Deprecated training script (leaky split). |
+| save_answer_only_metrics.py                | SAFE TO DELETE  | -                | Redundant hardcoded metrics script. |
+| false_positives.csv                        | SAFE TO DELETE  | -                | Diagnostic output (untracked). |
+| false_negatives.csv                        | SAFE TO DELETE  | -                | Diagnostic output (untracked). |
+| eda_outputs/ (directory)                   | MOVE            | results/         | Move generated EDA charts to results. |
+
+3.2 Project Dependency & Data Flow Map
+--------------------------------------
+The data flow and script execution dependencies are mapped below:
+
+                               [ HuggingFace HaluEval QA ]
+                                           |
+                                           v (inspect_halueval.py)
+                                    [ raw records ]
+                                           |
+                                           v (create_splits.py)
+                    +----------------------+----------------------+
+                    | (80% Train Pairs)                           | (20% Test Pairs)
+                    v                                             v
+              [ train.csv ]                                 [ test.csv ]
+                    |                                             |
+   +----------------+----------------+             +--------------+---------------+
+   | (EDA & Stats)                   | (Training)  | (Inference)                  | (Evaluation)
+   v                                 v             v                              v
+eda_basic.py                  train_baseline_clean.py <------ predict.py    evaluate_baselines.py
+eda_plots.py                  train_answer_only.py                          evaluate_length_baseline.py
+top_words.py                  train_linear_svc.py                           ablation_study.py
+analyze_length_statistics.py                                                cross_validation_study.py
+                                                                            analyze_errors.py
+                                                                            create_final_comparison.py
+
+3.3 Repository Hygiene & Structure Issues
+-----------------------------------------
+- Flat Directory Structure: 40+ scripts and configuration files sit at the root directory
+  level. This is a severe repository layout violation for any professional project.
+- Massive Gap in Commit History: The current GitHub repository has 17 commits, but they
+  were all made in a 6-minute window on June 11, 2026. Since then, 27 files (including
+  key result scripts, plots, metrics, and models) remain uncommitted.
+- Code Duplication: The text cleaning regex `clean_text()` and parts extraction regex
+  `extract_parts()` are duplicated verbatim across 14+ different scripts. This is extremely
+  poor software engineering practice.
+- Plotting Inefficiencies: There are 12 different python files each plotting a single metric,
+  rather than a unified plotting script or a visualization module.
+- Missing Standard Files: The repository lacks a LICENSE file.
+
+3.4 Minimum Reproducibility Set
+-------------------------------
+To reproduce all final reported results, only these 9 files are strictly necessary:
+1. requirements.txt (Dependencies)
+2. create_splits.py (Splitting HaluEval QA)
+3. train_baseline_clean.py (Knowledge + Q + A baseline)
+4. train_answer_only.py (Answer-Only TF-IDF model)
+5. evaluate_length_baseline.py (Length-Only baseline)
+6. ablation_study.py (Input configuration comparison)
+7. cross_validation_study.py (Cross-validation statistics)
+8. analyze_errors.py (Error logs generation)
+9. create_final_comparison.py (Final CSV ranks generation)
+
+
+================================================================================
+4. EVALUATION SCORES & METRICS
+================================================================================
+We evaluate the project on a set of core quality scores:
+
+1. Project Completion Percentage: 85%
+   The experimental pipeline is completely written and metrics are collected. The
+   remaining 15% is repository structuring, modularization, and deep learning baselines.
+
+2. ML Maturity Level: Level 4 (Rigorous Evaluation & Audit)
+   The project has gone beyond "model fitting" and actively checks for leakage,
+   confounds, and ablates features.
+
+3. Research Quality Score: 8 / 10
+   Excellent analytical observation regarding HaluEval QA length confound. To score a
+   9 or 10, it needs statistical significance testing (McNemar's) and a DL model check.
+
+4. GitHub Quality Score: 5 / 10
+   Very poor currently due to the flat root layout, missing LICENSE, and massive backlog
+   of uncommitted files.
+
+5. Reproducibility Score: 9 / 10
+   All results are easily reproducible because the seeds are locked (42), and the
+   raw splits can be re-downloaded and processed using clear, independent scripts.
+
+6. Recruiter Impression: 7 / 10
+   Will impress technical recruiters due to the depth of analytical reasoning and
+   practical leakage debugging, but needs a repository reorganization first.
+
+7. Amazon ML Summer School Impression: 8.5 / 10
+   A stellar project that shows the candidate does not blindly run code but understands
+   vulnerabilities in benchmarks.
+
+8. Publication Readiness Score: 6 / 10
+   Strong foundation for a workshop paper, but needs deep learning baselines and
+   length-controlled validation to be paper-ready.
+
+
+================================================================================
+5. CRITICAL ACTIONS BEFORE PUBLIC RELEASE
+================================================================================
+
+MUST DO:
+--------
+1. Reorganize directory structure (move files out of root into src/, scripts/, models/,
+   and results/ as recommended).
+2. Commit all 27 untracked files to GitHub. Leaving them untracked makes the project
+   invisible to anyone viewing the repository online.
+3. Delete all deprecated model pickls (`halluciguard_logreg_model.pkl`, etc.) and
+   deprecated training scripts (`train_baseline.py`) to prevent confusion.
+4. Add an MIT or Apache 2.0 LICENSE file to the root directory.
+
+SHOULD DO:
+----------
+1. Refactor data utility scripts: extract `clean_text()` and `extract_parts()` into
+   a single `src/utils/data_utils.py` module and import them into all scripts.
+2. Fix cross-validation leakage by moving `TfidfVectorizer.fit_transform()` inside the
+   K-fold loop in `cross_validation_study.py`.
+3. Consolidate the 12 separate `plot_*.py` files into a single `src/visualize/make_plots.py`
+   script.
+
+NICE TO HAVE:
+-------------
+1. Train a DistilBERT sequence classification baseline on Answer-Only and Full contexts
+   to evaluate if transformer embeddings are also susceptible to the length confound.
+2. Run a statistical significance test (McNemar's Test) comparing the Length-Only
+   baseline to the Answer-Only TF-IDF baseline.
+3. Conduct a length-controlled experiment where answers are truncated or padded to
+   remove the length variance, then verify what accuracy remains.
+
+SAFE TO IGNORE:
+---------------
+1. Training larger multi-billion parameter LLMs locally. A simple, lightweight deep
+   learning baseline (like DistilBERT) is sufficient for a baseline audit.
+
+
+================================================================================
+6. RECOMMENDED REPOSITORY REORGANIZATION
+================================================================================
+We recommend refactoring the flat directory structure into the following clean layout:
+
+HalluciGuard/
+├── .gitignore
+├── LICENSE
+├── README.md
+├── requirements.txt
+├── data/
+│   ├── train.csv (ignored by git)
+│   └── test.csv (ignored by git)
+├── models/
+│   ├── logistic_model.pkl
+│   ├── tfidf_vectorizer.pkl
+│   ├── answer_only_model.pkl
+│   └── answer_only_vectorizer.pkl
+├── results/
+│   ├── model_comparison.csv
+│   ├── ablation_results.csv
+│   ├── cross_validation_summary.json
+│   ├── error_analysis_summary.txt
+│   └── plots/ (confusion matrices, ROC/PR curves, length boxplots)
+├── scripts/
+│   ├── inspect_halueval.py
+│   ├── check_leakage.py
+│   └── run_pipeline.sh (shell script to run ingestion -> split -> train -> eval)
+└── src/
+    ├── __init__.py
+    ├── utils/
+    │   ├── __init__.py
+    │   └── data_utils.py (modularized clean_text & extract_parts)
+    ├── models/
+    │   ├── __init__.py
+    │   ├── train_baseline.py
+    │   ├── train_answer_only.py
+    │   └── train_svc.py
+    ├── evaluation/
+    │   ├── __init__.py
+    │   ├── evaluate_baselines.py
+    │   ├── evaluate_length.py
+    │   ├── ablation.py
+    │   ├── cv_study.py
+    │   ├── error_analysis.py
+    │   └── compile_results.py
+    ├── visualize/
+    │   ├── __init__.py
+    │   └── make_plots.py (consolidated plotting code)
+    └── inference/
+        ├── __init__.py
+        └── predict.py
+
+
+================================================================================
+7. CONCLUDING DIRECT VERDICTS (4 PERSONAS)
+================================================================================
+
+ML Engineer Persona
+-------------------
+> "The pipeline is solid, the seeds are locked, and the data leakage debugging is
+> highly professional. However, the software engineering quality is weak. The
+> code duplication of text cleaning functions across 14 scripts is a maintenance
+> nightmare, and having 44 files at the root level is unacceptable. Once they
+> modularize the utilities, put scripts into src/, and consolidate the plotting,
+> this will be an excellent production-grade baseline project."
+> Score: 7.0 / 10 -> 8.5 / 10 (after restructuring and modularization)
+
+Amazon ML Summer School Evaluator Persona
+-----------------------------------------
+> "This candidate shows a level of critical thinking that is very rare. Instead of
+> blindly feeding data to a model and hyping a high accuracy score, they analyzed
+> why the model was performing so well and caught a massive length confound in
+> the HaluEval QA benchmark. Their train-test split leakage remediation is also
+> highly rigorous. This project stands out significantly from the cookie-cutter
+> projects we see."
+> Score: 8.5 / 10 -> 9.0 / 10 (with a DistilBERT baseline)
+
+Research Mentor Persona
+-----------------------
+> "The discovery of the length confound in HaluEval QA is a strong starting point
+> for a workshop paper. However, as research, it is currently incomplete. We need
+> to see a statistical significance test (McNemar's) comparing the models, and
+> we must perform a length-controlled validation to see if the semantic models
+> learn anything useful when length is controlled. The vocabulary leakage in
+> the CV study must also be resolved."
+> Score: 6.0 / 10 -> 8.0 / 10 (after length-control and significance tests)
+
+Recruiter Persona
+-----------------
+> "The README looks clean and has nice results tables, and the topic is highly relevant.
+> But if I pass this repository link to a hiring manager, the first thing they will see
+> is a flat root directory with 44 files and a bunch of uncommitted work. The mismatch
+> between local workspace files and what is actually on GitHub is huge. Once the candidate
+> organizes the folders and commits all their files, this is an excellent portfolio addition."
+> Score: 6.5 / 10 -> 8.0 / 10 (after commit and refactoring)
+
+================================================================================
+                            END OF AUDIT REPORT
+================================================================================

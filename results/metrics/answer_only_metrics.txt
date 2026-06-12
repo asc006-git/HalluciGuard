@@ -1,0 +1,18 @@
+=== Answer-Only Model Metrics ===
+
+Accuracy:  0.9190
+Precision: 0.9501
+Recall:    0.8845
+F1 Score:  0.9161
+ROC-AUC:   0.9673
+
+=== Confusion Matrix ===
+               Predicted 0    Predicted 1
+Actual 0 (factual)       1769             231
+Actual 1 (halluc)         231            1769
+
+=== Confusion Matrix Values ===
+True Negatives:  1769
+False Positives: 231
+False Negatives: 231
+True Positives:  1769

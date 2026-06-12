@@ -1,9 +1,13 @@
 import pandas as pd
 import re
 import numpy as np
+import os
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
+
+RESULTS_DIR = "results"
+os.makedirs(RESULTS_DIR, exist_ok=True)
 
 def clean_text(text):
     text = str(text)
@@ -70,8 +74,8 @@ def train_and_evaluate(X_train, X_test, y_train, y_test, model_name):
 
 def main():
     print("Loading data...")
-    train_df = pd.read_csv("train.csv")
-    test_df = pd.read_csv("test.csv")
+    train_df = pd.read_csv("data/processed/train.csv")
+    test_df = pd.read_csv("data/processed/test.csv")
     print(f"Train: {len(train_df)}, Test: {len(test_df)}")
     
     print("Extracting components...")
@@ -120,6 +124,10 @@ def main():
     # Best model
     best = max(results, key=lambda x: x['f1'])
     print(f"\nBest model by F1: {best['model']} (F1={best['f1']:.4f})")
+
+    results_df = pd.DataFrame(results)
+    results_df.to_csv(os.path.join(RESULTS_DIR, "metrics/ablation_results.csv"), index=False)
+    print(f"\nSaved: {os.path.join(RESULTS_DIR, 'ablation_results.csv')}")
 
 if __name__ == "__main__":
     main()

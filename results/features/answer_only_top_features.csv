@@ -1,0 +1,41 @@
+feature,coefficient,type
+was,15.289469129497517,Hallucination
+is,15.14010579286387,Hallucination
+in,11.396795946954638,Hallucination
+are,6.858400799005754,Hallucination
+has,6.626839349673118,Hallucination
+both,6.425874612217197,Hallucination
+for,6.3434165955129975,Hallucination
+played,5.948457351743865,Hallucination
+with,5.636077603775933,Hallucination
+by,5.471334734164422,Hallucination
+not,5.234456101101447,Hallucination
+from,4.840711988803634,Hallucination
+directed,4.745650525848142,Hallucination
+were,4.68623353336465,Hallucination
+at,4.528110441335302,Hallucination
+won,4.487789040512415,Hallucination
+have,4.285511327353014,Hallucination
+had,4.207760959509246,Hallucination
+wrote,4.142197399739591,Hallucination
+different,3.9628269815051276,Hallucination
+yes,-2.0347284680714273,Factual
+no,-1.6317459018150486,Factual
+good,-1.2215917531827667,Factual
+university of,-1.1877122223965557,Factual
+film director,-1.023499824292493,Factual
+september,-0.9263132132704814,Factual
+georgia,-0.9112846603967821,Factual
+1987,-0.8829320661151799,Factual
+white,-0.8825865487863972,Factual
+republic of,-0.8795039814865725,Factual
+england,-0.8579148692916093,Factual
+1918,-0.8367948639438704,Factual
+minority,-0.830405357421321,Factual
+york city,-0.8280334123161904,Factual
+1957,-0.7655424887670746,Factual
+1976,-0.7592194631059942,Factual
+1972,-0.7520166190171201,Factual
+february,-0.731727446181785,Factual
+albania,-0.7312138430588333,Factual
+july,-0.7237722577621084,Factual

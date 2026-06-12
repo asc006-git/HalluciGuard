@@ -4,9 +4,9 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 def main():
-    os.makedirs("eda_outputs", exist_ok=True)
+    os.makedirs("docs/assets/eda", exist_ok=True)
     
-    df = pd.read_csv("halluciguard_dataset.csv")
+    df = pd.read_csv("data/raw/halluciguard_dataset.csv")
     df["text_length"] = df["text"].str.len()
     df["word_count"] = df["text"].str.split().str.len()
     
@@ -29,9 +29,9 @@ def main():
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
     plt.tight_layout()
-    plt.savefig("eda_outputs/class_distribution.png", dpi=300, bbox_inches="tight")
+    plt.savefig("docs/assets/eda/class_distribution.png", dpi=300, bbox_inches="tight")
     plt.close()
-    print("Saved: eda_outputs/class_distribution.png")
+    print("Saved: docs/assets/eda/class_distribution.png")
     
     # 2. Text Length Histogram
     fig, ax = plt.subplots()
@@ -45,9 +45,9 @@ def main():
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
     plt.tight_layout()
-    plt.savefig("eda_outputs/text_length_histogram.png", dpi=300, bbox_inches="tight")
+    plt.savefig("docs/assets/eda/text_length_histogram.png", dpi=300, bbox_inches="tight")
     plt.close()
-    print("Saved: eda_outputs/text_length_histogram.png")
+    print("Saved: docs/assets/eda/text_length_histogram.png")
     
     # 3. Word Count Histogram
     fig, ax = plt.subplots()
@@ -61,11 +61,11 @@ def main():
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
     plt.tight_layout()
-    plt.savefig("eda_outputs/word_count_histogram.png", dpi=300, bbox_inches="tight")
+    plt.savefig("docs/assets/eda/word_count_histogram.png", dpi=300, bbox_inches="tight")
     plt.close()
-    print("Saved: eda_outputs/word_count_histogram.png")
+    print("Saved: docs/assets/eda/word_count_histogram.png")
     
-    print("\nAll plots saved to eda_outputs/")
+    print("\nAll plots saved to docs/assets/eda/")
 
 if __name__ == "__main__":
     main()
