@@ -142,7 +142,7 @@ To prevent leakage, the split is performed on the $10,000$ paired records **befo
 
 ## Exploratory Data Analysis (EDA)
 
-Exploratory data analysis of text lengths (retrieved from `results/length_statistics.csv`) revealed a major structural artifact:
+Exploratory data analysis of text lengths (retrieved from `results/features/length_statistics.csv`) revealed a major structural artifact:
 
 | Class | n_samples | Character Mean | Character Median | Character Std | Word Mean | Word Median | Word Std |
 |---|---|---|---|---|---|---|---|
@@ -308,8 +308,8 @@ HalluciGuard/
 │       └── test.csv                    # Clean test split (4K samples)
 ├── archive/                            # Legacy scripts and data
 │   ├── legacy_fulltext_model/
-│   │   ├── .py
-│   │   └── .py
+│   │   ├── analyze_errors.py
+│   │   └── train_baseline_clean.py
 │   ├── create_binary_dataset.py
 │   ├── eda_basic.py
 │   ├── inspect_halueval.py
@@ -317,7 +317,9 @@ HalluciGuard/
 │   └── train_baseline.py
 ├── models/                             # Serialized production models
 │   ├── answer_only_model.pkl
-│   └── answer_only_vectorizer.pkl
+│   ├── answer_only_vectorizer.pkl
+│   ├── linear_svc_model.pkl
+│   └── linear_svc_vectorizer.pkl
 └── results/                            # Metrics, features, and visualizations
     ├── metrics/
     │   ├── ablation_results.csv
@@ -327,7 +329,7 @@ HalluciGuard/
     │   ├── baseline_comparison.csv
     │   └── length_baseline_results.csv
     ├── features/
-    │   ├── answer_only_
+    │   ├── answer_only_top_features.csv
     │   └── length_statistics.csv
     └── plots/
         ├── answer_only_confusion_matrix.png
