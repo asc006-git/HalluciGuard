@@ -1,9 +1,14 @@
 import pandas as pd
 import re
 import numpy as np
+import joblib
+import os
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.svm import LinearSVC
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+
+MODELS_DIR = "models"
+os.makedirs(MODELS_DIR, exist_ok=True)
 
 def clean_text(text):
     text = str(text)
@@ -80,6 +85,13 @@ def main():
     print(f"Precision: {prec:.4f}")
     print(f"Recall:    {rec:.4f}")
     print(f"F1 Score:  {f1:.4f}")
+
+    model_path = os.path.join(MODELS_DIR, "linear_svc_model.pkl")
+    vectorizer_path = os.path.join(MODELS_DIR, "linear_svc_vectorizer.pkl")
+    joblib.dump(clf, model_path)
+    joblib.dump(vectorizer, vectorizer_path)
+    print(f"\nSaved: {model_path}")
+    print(f"Saved: {vectorizer_path}")
 
 if __name__ == "__main__":
     main()
