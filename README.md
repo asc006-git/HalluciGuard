@@ -1,14 +1,25 @@
-# HalluciGuard 🛡️
-[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/)
-[![scikit-learn](https://img.shields.io/badge/scikit--learn-1.3.0+-orange.svg)](https://scikit-learn.org/stable/)
-[![HuggingFace HaluEval](https://img.shields.io/badge/Dataset-HaluEval-yellow.svg)](https://huggingface.co/datasets/pminervini/HaluEval)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
+# HalluciGuard
+
+> A reproducible machine learning investigation into hallucination detection, data leakage, shortcut learning, and evaluation reliability using the HaluEval QA benchmark.
+
+<p align="center">
+
+<img src="https://img.shields.io/badge/Python-3.10+-111827?style=for-the-badge&logo=python&logoColor=FFD43B" />
+<img src="https://img.shields.io/badge/scikit--learn-111827?style=for-the-badge&logo=scikitlearn&logoColor=F7931E" />
+<img src="https://img.shields.io/badge/Pandas-111827?style=for-the-badge&logo=pandas&logoColor=150458" />
+<img src="https://img.shields.io/badge/NumPy-111827?style=for-the-badge&logo=numpy&logoColor=4DABCF" />
+<img src="https://img.shields.io/badge/HaluEval-111827?style=for-the-badge&logo=huggingface&logoColor=FFD21E" />
+<img src="https://img.shields.io/badge/License-MIT-111827?style=for-the-badge" />
+
+</p>
+
+---
 
 HalluciGuard is a rigorous end-to-end machine learning investigation focused on standardizing, evaluating, and identifying critical methodological vulnerabilities in LLM hallucination detection. Utilizing the **HaluEval QA** benchmark, this project demonstrates the entire lifecycle of a machine learning workflow: from dataset ingestion and pair-level cleaning to model training, ablation studies, error analysis, cross-validation, and the critical discovery of dataset artifacts.
 
 ---
 
-## 📌 Table of Contents
+## Table of Contents
 1. [Project Overview](#project-overview)
 2. [Problem Statement](#problem-statement)
 3. [Key Features](#key-features)
@@ -279,34 +290,8 @@ Isolating only the answer text (F1=0.916) outperforms including question (F1=0.7
 
 ```
 HalluciGuard/
-├── requirements.txt                    # System dependencies
-├── create_splits.py                    # Pair-level clean stratified splits
-├── check_leakage.py                    # Diagnostic data leakage demo
-├── analyze_length_statistics.py        # Length statistics computation
-├── train_answer_only.py                # Answer-Only Logistic Regression training
-├── train_linear_svc.py                 # LinearSVC training on Answer-Only
-├── cross_validation_study.py           # Stratified 5-Fold Cross-Validation (leakage-free)
-├── evaluate_baselines.py               # Random and Majority class baseline evaluation
-├── evaluate_length_baseline.py         # Length-Only baseline evaluation
-├── ablation_study.py                   # Input configuration ablation study
-├── create_final_comparison.py          # Final comparison table generator
-├── predict.py                          # CLI and interactive inference pipeline
-├── eda_plots.py                        # Statistical distributions plotting
-├── plot_answer_only_confusion_matrix.py
-├── plot_answer_only_roc_curve.py
-├── plot_answer_only_precision_recall_curve.py
-├── plot_answer_only_feature_importance.py
-├── plot_cv_results.py
-├── plot_length_distribution.py
-├── plot_wordcount_distribution.py
-├── plot_length_boxplot.py
-├── data/
-│   ├── raw/
-│   │   └── halluciguard_dataset.csv    # Full binary dataset (20K samples)
-│   └── processed/
-│       ├── train.csv                   # Clean train split (16K samples)
-│       └── test.csv                    # Clean test split (4K samples)
-├── archive/                            # Legacy scripts and data
+│
+├── archive/
 │   ├── legacy_fulltext_model/
 │   │   ├── analyze_errors.py
 │   │   └── train_baseline_clean.py
@@ -315,32 +300,80 @@ HalluciGuard/
 │   ├── inspect_halueval.py
 │   ├── top_words.py
 │   └── train_baseline.py
-├── models/                             # Serialized production models
+│
+├── data/
+│   ├── processed/
+│   │   ├── train.csv
+│   │   └── test.csv
+│   └── raw/
+│       └── halluciguard_dataset.csv
+│
+├── docs/
+│   └── assets/
+│       └── eda/
+│           ├── class_distribution.png
+│           ├── text_length_histogram.png
+│           └── word_count_histogram.png
+│
+├── models/
 │   ├── answer_only_model.pkl
 │   ├── answer_only_vectorizer.pkl
 │   ├── linear_svc_model.pkl
 │   └── linear_svc_vectorizer.pkl
-└── results/                            # Metrics, features, and visualizations
-    ├── metrics/
-    │   ├── ablation_results.csv
-    │   ├── model_comparison.csv
-    │   ├── cross_validation_results.csv
-    │   ├── cross_validation_summary.json
-    │   ├── baseline_comparison.csv
-    │   └── length_baseline_results.csv
-    ├── features/
-    │   ├── answer_only_top_features.csv
-    │   └── length_statistics.csv
-    └── plots/
-        ├── answer_only_confusion_matrix.png
-        ├── answer_only_roc_curve.png
-        ├── answer_only_precision_recall_curve.png
-        ├── answer_only_feature_importance.png
-        ├── cv_f1_distribution.png
-        ├── cv_metric_comparison.png
-        ├── length_distribution_by_class.png
-        ├── wordcount_distribution_by_class.png
-        └── boxplot_length_by_class.png
+│
+├── results/
+│   ├── features/
+│   │   ├── answer_only_top_features.csv
+│   │   └── length_statistics.csv
+│   │
+│   ├── metrics/
+│   │   ├── ablation_results.csv
+│   │   ├── answer_only_metrics.json
+│   │   ├── answer_only_metrics.txt
+│   │   ├── baseline_comparison.csv
+│   │   ├── cross_validation_results.csv
+│   │   ├── cross_validation_summary.json
+│   │   ├── cross_validation_summary.txt
+│   │   ├── length_baseline_results.csv
+│   │   └── model_comparison.csv
+│   │
+│   └── plots/
+│       ├── answer_only_confusion_matrix.png
+│       ├── answer_only_feature_importance.png
+│       ├── answer_only_precision_recall_curve.png
+│       ├── answer_only_roc_curve.png
+│       ├── boxplot_length_by_class.png
+│       ├── cv_f1_distribution.png
+│       ├── cv_metric_comparison.png
+│       ├── length_distribution_by_class.png
+│       └── wordcount_distribution_by_class.png
+│
+├── .gitignore
+├── LICENSE
+├── README.md
+├── requirements.txt
+│
+├── ablation_study.py
+├── analyze_length_statistics.py
+├── check_leakage.py
+├── create_final_comparison.py
+├── create_splits.py
+├── cross_validation_study.py
+├── eda_plots.py
+├── evaluate_baselines.py
+├── evaluate_length_baseline.py
+├── final_verify.py
+├── plot_answer_only_confusion_matrix.py
+├── plot_answer_only_feature_importance.py
+├── plot_answer_only_precision_recall_curve.py
+├── plot_answer_only_roc_curve.py
+├── plot_cv_results.py
+├── plot_length_boxplot.py
+├── plot_length_distribution.py
+├── plot_wordcount_distribution.py
+├── predict.py
+├── train_answer_only.py
+└── train_linear_svc.py
 ```
 
 ---
@@ -507,12 +540,12 @@ The generated visualizations are stored in [results/plots/](results/plots/) and 
 
 ## Project Contributions
 
-### 🔬 Research Contributions
+### Research Contributions
 *   **Identified and documented HaluEval length bias**: Proved that a simple 2-parameter length model beats a 10,000-parameter TF-IDF content model ($94.35\%$ vs. $91.90\%$ Accuracy).
 *   **Exposed the TF-IDF proxy mechanism**: Analyzed feature coefficients to prove that the content model relies on copulas and prepositions (copula count as a proxy for sentence length) rather than facts.
 *   **Formulated the leakage overlap proof**: Mathematically modeled and empirically verified the $32.24\%$ context leakage risk on HaluEval QA.
 
-### 🛠️ Engineering Contributions
+### Engineering Contributions
 *   **Modular Pipeline**: Built clean, isolated scripts for ingestion, splitting, training, and testing with a reproducible seed framework.
 *   **Persistence & Logging**: Persisted all results into structured formats (`results/` directory containing JSON, CSV, and text summaries) to ensure reproducibility.
 *   **Production CLI**: Designed a robust, production-quality `predict.py` command-line and interactive inference tool with comprehensive error handling.
