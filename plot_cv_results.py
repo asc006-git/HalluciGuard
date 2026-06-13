@@ -6,7 +6,7 @@ import os
 RESULTS_DIR = "results"
 
 def main():
-    df = pd.read_csv(os.path.join(RESULTS_DIR, "cross_validation_results.csv"))
+    df = pd.read_csv(os.path.join(RESULTS_DIR, "metrics/cross_validation_results.csv"))
     
     # Plot 1: F1 Distribution
     fig, ax = plt.subplots(figsize=(8, 5))
