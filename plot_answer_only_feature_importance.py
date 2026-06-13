@@ -2,6 +2,9 @@ import joblib
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import os
+
+RESULTS_DIR = "results"
 
 def main():
     print("Loading model and vectorizer...")
